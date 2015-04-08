@@ -5,7 +5,10 @@
 #include <iostream>
 #include <fstream>
 #include <queue>
+#include <deque>
 #include <string>
+#include <set>
+
 using namespace std;
 
 struct bank_state{
@@ -19,11 +22,13 @@ struct bank_state{
 
 struct node{
 	bank_state state;
-	bank_state parent_node;
+	//bank_state parent_node;
 	int operation = 0;
 	int depth = 0;
 	int path_cost = 0;
-	string parents = "";
+	//node *parent_node;
+	//string parents = "";
+	string state_key = "";
 };
 
 void print_node(node temp){
@@ -42,11 +47,12 @@ void print_node(node temp){
 }
 void print_node2(node temp){
 	cout << temp.state.left_missionaries << "," << temp.state.left_cannibals << "," << temp.state.left_boats << "," << temp.state.right_missionaries
-		<< "," << temp.state.right_cannibals << "," << temp.state.right_boats << "," << "    depth=" << temp.depth << 
-		"		parent=" 
-/*		<< temp.parent_node.left_missionaries << "," << temp.parent_node.left_cannibals << "," << temp.parent_node.left_boats << "," << temp.parent_node.right_missionaries
-	<< "," << temp.parent_node.right_cannibals << "," << temp.parent_node.right_boats << ",             "  */ 
-	<< temp.parents << endl;
+		<< "," << temp.state.right_cannibals << "," << temp.state.right_boats << "," << "    depth=" << temp.depth <<
+		"		parent="
+		/*		<< temp.parent_node.left_missionaries << "," << temp.parent_node.left_cannibals << "," << temp.parent_node.left_boats << "," << temp.parent_node.right_missionaries
+			<< "," << temp.parent_node.right_cannibals << "," << temp.parent_node.right_boats << ",             "  */
+			<< endl;
+	//<< temp.parents << endl;
 	//ofstream myfile;
 	//myfile.open("mcb_log.txt",ios::app);
 	//myfile << temp.state.left_missionaries << "," << temp.state.left_cannibals << "," << temp.state.left_boats << "," << temp.state.right_missionaries
@@ -84,13 +90,13 @@ bool nodePassed(node current, node goal){
 }
 
 
-bool general_search(int problem, queue<node> &myqueue){
+bool general_search(int problem, deque<node> &myqueue){
 
 	//create queue
 	node starting_node;
 	node goal_node;
 	node nd;
-
+	set<string> myset;
 	goal_node.state.left_missionaries = 3;
 	goal_node.state.left_cannibals = 3;
 	goal_node.state.left_boats = 1;
@@ -105,8 +111,10 @@ bool general_search(int problem, queue<node> &myqueue){
 	starting_node.state.right_missionaries = 3;
 	starting_node.state.right_cannibals = 3;
 	starting_node.state.right_boats = 1;
-	starting_node.parents = state_string(starting_node);
-	myqueue.push(starting_node);
+	starting_node.state_key = state_string(starting_node);
+	//starting_node.parents = state_string(starting_node);
+	auto result_set = myset.insert(starting_node.state_key);
+	myqueue.push_back(starting_node);
 
 
 	cout << "myquue contains:" << endl;
@@ -127,9 +135,12 @@ bool general_search(int problem, queue<node> &myqueue){
 				new_node.state.left_boats = 1;
 				new_node.state.right_boats = 0;
 				new_node.depth += 1;
-				new_node.parent_node = nd.state;
-				new_node.parents = state_string(new_node) + "<--" + nd.parents;
-				myqueue.push(new_node);
+				//new_node.parent_node = nd.state;
+				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
+				new_node.state_key = state_string(new_node);
+				result_set = myset.insert(new_node.state_key);
+				if (result_set.second)
+					myqueue.push_back(new_node);
 				if (nodePassed(new_node, goal_node)){
 					return true;
 				}
@@ -145,9 +156,12 @@ bool general_search(int problem, queue<node> &myqueue){
 				new_node.state.left_boats = 0;
 				new_node.state.right_boats = 1;
 				new_node.depth += 1;
-				new_node.parent_node = nd.state;
-				new_node.parents = state_string(new_node) + "<--" + nd.parents;
-				myqueue.push(new_node);
+				//new_node.parent_node = nd.state;
+				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
+				new_node.state_key = state_string(new_node);
+				result_set = myset.insert(new_node.state_key);
+				if (result_set.second)
+					myqueue.push_back(new_node);
 				if (nodePassed(new_node, goal_node)){
 					return true;
 				}
@@ -166,9 +180,14 @@ bool general_search(int problem, queue<node> &myqueue){
 				new_node.state.left_boats = 1;
 				new_node.state.right_boats = 0;
 				new_node.depth += 1;
-				new_node.parent_node = nd.state;
-				new_node.parents = state_string(new_node) + "<--" + nd.parents;
-				myqueue.push(new_node);
+				//new_node.parent_node = nd.state;
+				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
+								new_node.state_key = state_string(new_node);
+
+				result_set = myset.insert(new_node.state_key);
+
+				if (result_set.second)
+					myqueue.push_back(new_node);
 				if (nodePassed(new_node, goal_node)){
 					return true;
 				}
@@ -184,9 +203,14 @@ bool general_search(int problem, queue<node> &myqueue){
 				new_node.state.left_boats = 0;
 				new_node.state.right_boats = 1;
 				new_node.depth += 1;
-				new_node.parent_node = nd.state;
-				new_node.parents = state_string(new_node) + "<--" + nd.parents;
-				myqueue.push(new_node);
+				//new_node.parent_node = nd.state;
+				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
+								new_node.state_key = state_string(new_node);
+
+				result_set = myset.insert(new_node.state_key);
+
+				if (result_set.second)
+					myqueue.push_back(new_node);
 				if (nodePassed(new_node, goal_node)){
 					return true;
 				}
@@ -206,9 +230,14 @@ bool general_search(int problem, queue<node> &myqueue){
 				new_node.state.left_boats = 1;
 				new_node.state.right_boats = 0;
 				new_node.depth += 1;
-				new_node.parent_node = nd.state;
-				new_node.parents = state_string(new_node) + "<--" + nd.parents;
-				myqueue.push(new_node);
+				//new_node.parent_node = nd.state;
+				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
+								new_node.state_key = state_string(new_node);
+
+				result_set = myset.insert(new_node.state_key);
+
+				if (result_set.second)
+					myqueue.push_back(new_node);
 				if (nodePassed(new_node, goal_node)){
 					return true;
 				}
@@ -224,9 +253,14 @@ bool general_search(int problem, queue<node> &myqueue){
 				new_node.state.left_boats = 0;
 				new_node.state.right_boats = 1;
 				new_node.depth += 1;
-				new_node.parent_node = nd.state;
-				new_node.parents = state_string(new_node) + "<--" + nd.parents;
-				myqueue.push(new_node);
+				//new_node.parent_node = nd.state;
+				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
+								new_node.state_key = state_string(new_node);
+
+				result_set = myset.insert(new_node.state_key);
+
+				if (result_set.second)
+					myqueue.push_back(new_node);
 				if (nodePassed(new_node, goal_node)){
 					return true;
 				}
@@ -248,9 +282,14 @@ bool general_search(int problem, queue<node> &myqueue){
 				new_node.state.left_boats = 1;
 				new_node.state.right_boats = 0;
 				new_node.depth += 1;
-				new_node.parent_node = nd.state;
-				new_node.parents = state_string(new_node) + "<--" + nd.parents;
-				myqueue.push(new_node);
+				//new_node.parent_node = nd.state;
+				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
+								new_node.state_key = state_string(new_node);
+
+				result_set = myset.insert(new_node.state_key);
+
+				if (result_set.second)
+					myqueue.push_back(new_node);
 				if (nodePassed(new_node, goal_node)){
 					return true;
 				}
@@ -269,9 +308,14 @@ bool general_search(int problem, queue<node> &myqueue){
 				new_node.state.left_boats = 0;
 				new_node.state.right_boats = 1;
 				new_node.depth += 1;
-				new_node.parent_node = nd.state;
-				new_node.parents = state_string(new_node) + "<--" + nd.parents;
-				myqueue.push(new_node);
+				//new_node.parent_node = nd.state;
+				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
+								new_node.state_key = state_string(new_node);
+
+				result_set = myset.insert(new_node.state_key);
+
+				if (result_set.second)
+					myqueue.push_back(new_node);
 				if (nodePassed(new_node, goal_node)){
 					return true;
 				}
@@ -292,11 +336,16 @@ bool general_search(int problem, queue<node> &myqueue){
 				new_node.state.left_boats = 1;
 				new_node.state.right_boats = 0;
 				new_node.depth += 1;
-				new_node.parent_node = nd.state;
+				//new_node.parent_node = nd.state;
 
 
-				new_node.parents = state_string(new_node) + "<--" + nd.parents;
-				myqueue.push(new_node);
+				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
+								new_node.state_key = state_string(new_node);
+
+				result_set = myset.insert(new_node.state_key);
+
+				if (result_set.second)
+					myqueue.push_back(new_node);
 				if (nodePassed(new_node, goal_node)){
 					return true;
 				}
@@ -312,10 +361,15 @@ bool general_search(int problem, queue<node> &myqueue){
 				new_node.state.left_boats = 0;
 				new_node.state.right_boats = 1;
 				new_node.depth += 1;
-				new_node.parent_node = nd.state;
+				//new_node.parent_node = nd.state;
 
-				new_node.parents = state_string(new_node) + "<--" + nd.parents;
-				myqueue.push(new_node);
+				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
+								new_node.state_key = state_string(new_node);
+
+				result_set = myset.insert(new_node.state_key);
+
+				if (result_set.second)
+					myqueue.push_back(new_node);
 				if (nodePassed(new_node, goal_node)){
 					return true;
 				}
@@ -323,13 +377,13 @@ bool general_search(int problem, queue<node> &myqueue){
 		}
 
 
-		myqueue.pop();
+		myqueue.pop_front();
 	}
-	while (!myqueue.empty()){
-		node temp = myqueue.front();
-		print_node(temp);
-		myqueue.pop();
-	}
+	//while (!myqueue.empty()){
+	//	node temp = myqueue.front();
+	//	print_node(temp);
+	//	myqueue.pop();
+	//}
 
 
 	return false;
@@ -338,7 +392,7 @@ bool general_search(int problem, queue<node> &myqueue){
 
 int main(int argc, _TCHAR* argv[])
 {
-	queue<node> some_queue;
+	deque<node> some_queue;
 
 	if (general_search(5,some_queue)){
 		print_node(some_queue.front());
@@ -347,7 +401,7 @@ int main(int argc, _TCHAR* argv[])
 
 		node temp = some_queue.back();
 		print_node2(temp);
-		some_queue.pop();
+		some_queue.pop_front();
 
 	}
 	  else {
