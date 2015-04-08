@@ -1,5 +1,7 @@
 // ConsoleApplication2.cpp : Defines the entry point for the console application.
 //
+// Keil Boring CS311 HW#1
+
 
 #include "stdafx.h"
 #include <iostream>
@@ -23,10 +25,10 @@ struct bank_state{
 struct node{
 	bank_state state;
 	//bank_state parent_node;
-	int operation = 0;
+	//int operation = 0;
 	int depth = 0;
-	int path_cost = 0;
-	node *parent_node;
+	//int path_cost = 0;
+	//node *parent_node;
 	//string parents = "";
 	string state_key = "";
 };
@@ -35,19 +37,8 @@ int NODES_EXPANDED = 0;
 
 void print_node(node temp){
 	cout << temp.state.left_missionaries << "," << temp.state.left_cannibals << "," << temp.state.left_boats << "," << temp.state.right_missionaries
-		<< "," << temp.state.right_cannibals << "," << temp.state.right_boats << "," << "    depth=" << temp.depth <<
-		"		parent="
-		/*		<< temp.parent_node.left_missionaries << "," << temp.parent_node.left_cannibals << "," << temp.parent_node.left_boats << "," << temp.parent_node.right_missionaries
-			<< "," << temp.parent_node.right_cannibals << "," << temp.parent_node.right_boats << ",             "  */
-			<< endl;
-	//<< temp.parents << endl;
-	//ofstream myfile;
-	//myfile.open("mcb_log.txt",ios::app);
-	//myfile << temp.state.left_missionaries << "," << temp.state.left_cannibals << "," << temp.state.left_boats << "," << temp.state.right_missionaries
-	//	<< "," << temp.state.right_cannibals << "," << temp.state.right_boats << "," << "    depth=" << temp.depth << "		parent="
-	//	<< temp.parent_node.left_missionaries << "," << temp.parent_node.left_cannibals << "," << temp.parent_node.left_boats << "," << temp.parent_node.right_missionaries
-	//	<< "," << temp.parent_node.right_cannibals << "," << temp.parent_node.right_boats << "," << endl;
-	//myfile.close();
+		<< "," << temp.state.right_cannibals << "," << temp.state.right_boats << "," << "    depth=" << temp.depth <<  endl;
+
 }
 
 string state_string(node temp){
@@ -277,22 +268,26 @@ bool bfs(node starting_node, node goal_node, deque<node> &fringe){
 	fringe.push_front(starting_node);
 
 	while (!fringe.empty()){
+		//get first node in queue
 		nd = fringe.front();
+		fringe.pop_front();
 		print_node(nd);
 
+		//Is this our goal node
+		if (nodePassed(nd, goal_node)){
+			return true;
+		}
+
+		//expand node
 		for (int i = 1; i <= 5; i++){
 			node new_node = nd;
 			if (ExpandNode(nd, i, new_node) == true){
 				result_set = myset.insert(new_node.state_key);
+				//dont add to queue if we have seen this state before
 				if (result_set.second)
 					fringe.push_back(new_node);
-				if (nodePassed(new_node, goal_node)){
-					return true;
-				}
 			}
 		}
-
-		fringe.pop_front();
 		NODES_EXPANDED += 1;
 	}
 	return false;
@@ -304,30 +299,31 @@ bool dfs(node starting_node, node goal_node, deque<node> &fringe){
 
 	auto result_set = myset.insert(starting_node.state_key);
 	fringe.push_front(starting_node);
-	while (!fringe.empty()){
-		bool node_expanded = false;
 
+	while (!fringe.empty()){
+		//get front of queue
 		nd = fringe.front();
+		fringe.pop_front();
 		print_node(nd);
 
+		//check if goal node
+		if (nodePassed(nd, goal_node)){
+			return true;
+		}
+
+		//expand node
 		for (int i = 5; i > 0; i--){
 			node new_node = nd;
 			if (ExpandNode(nd, i, new_node) == true){
 				result_set = myset.insert(new_node.state_key);
-				//wrong need to check if we found sorter path earlier
 				if (result_set.second){
 					fringe.push_front(new_node);
-					node_expanded = true;
 				}
-				if (nodePassed(new_node, goal_node)){
-					return true;
-				}
+
 			}
-			NODES_EXPANDED += 1;
 		}
-		//NODES_EXPANDED += 1;
-		if (node_expanded == false)
-			fringe.pop_front();
+
+		NODES_EXPANDED += 1;
 	}
 	return false;
 }
@@ -341,14 +337,22 @@ bool idfs(node starting_node, node goal_node, deque<node> &fringe){
 		myset.clear();
 		auto result_set = myset.insert(starting_node.state_key);
 		fringe.push_front(starting_node);
-		while (!fringe.empty()){
-			bool node_expanded = false;
 
+		while (!fringe.empty()){
+			//get front of queue
 			nd = fringe.front();
+			fringe.pop_front();
 			print_node(nd);
 
-			//check if current is greater than max depth
+			//check if goal node
+			if (nodePassed(nd, goal_node)){
+				return true;
+			}
+
+			//check if depth is passed max depth
 			if (nd.depth <= max_depth){
+
+				//expand node
 				for (int i = 5; i > 0; i--){
 					node new_node = nd;
 					if (ExpandNode(nd, i, new_node) == true){
@@ -356,18 +360,13 @@ bool idfs(node starting_node, node goal_node, deque<node> &fringe){
 						//wrong need to check if we found sorter path earlier
 						if (result_set.second){
 							fringe.push_front(new_node);
-							node_expanded = true;
 						}
-						if (nodePassed(new_node, goal_node)){
-							return true;
-						}
+
 					}
-					NODES_EXPANDED += 1;
 				}
 			}
-			//NODES_EXPANDED += 1;
-			if (node_expanded == false)
-				fringe.pop_front();
+
+			NODES_EXPANDED += 1;
 		}
 		max_depth += 1;
 	}
@@ -396,7 +395,7 @@ int main(int argc, _TCHAR* argv[])
 	starting_node.state_key = state_string(starting_node);
 
 
-	if (idfs(starting_node, goal_node, some_queue)){
+	if (bfs(starting_node, goal_node, some_queue)){
 		cout << "found a soultion\n";
 		cout << "Nodes expanded ="  << NODES_EXPANDED << endl;
 	}
