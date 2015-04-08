@@ -26,11 +26,12 @@ struct node{
 	int operation = 0;
 	int depth = 0;
 	int path_cost = 0;
-	//node *parent_node;
+	node *parent_node;
 	//string parents = "";
 	string state_key = "";
 };
 
+int NODES_EXPANDED = 0;
 
 void print_node(node temp){
 	cout << temp.state.left_missionaries << "," << temp.state.left_cannibals << "," << temp.state.left_boats << "," << temp.state.right_missionaries
@@ -47,14 +48,15 @@ void print_node(node temp){
 	//	<< temp.parent_node.left_missionaries << "," << temp.parent_node.left_cannibals << "," << temp.parent_node.left_boats << "," << temp.parent_node.right_missionaries
 	//	<< "," << temp.parent_node.right_cannibals << "," << temp.parent_node.right_boats << "," << endl;
 	//myfile.close();
-
 }
+
 string state_string(node temp){
 	string temp_string = "";
 	temp_string =  to_string( temp.state.left_missionaries )  + ","  + to_string( temp.state.left_cannibals )  + ","  + to_string( temp.state.left_boats )  + ","  + to_string( temp.state.right_missionaries
 		)  + ","  + to_string( temp.state.right_cannibals ) + ","  + to_string( temp.state.right_boats );   
 	return temp_string;
 }
+
 bool nodePassed(node current, node goal){
 	if (
 		current.state.left_boats == goal.state.left_boats &&
@@ -89,7 +91,7 @@ bool ExpandNode(node nd, int successor, node &new_node){
 				//new_node.parent_node = nd.state;
 				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
 				new_node.state_key = state_string(new_node);
-
+				return true;
 			}
 		}
 		//boat on left
@@ -104,7 +106,7 @@ bool ExpandNode(node nd, int successor, node &new_node){
 				//new_node.parent_node = nd.state;
 				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
 				new_node.state_key = state_string(new_node);
-
+				return true;
 			}
 		}
 		break;
@@ -125,7 +127,7 @@ bool ExpandNode(node nd, int successor, node &new_node){
 				//new_node.parent_node = nd.state;
 				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
 				new_node.state_key = state_string(new_node);
-
+				return true;
 			}
 		}
 		//boat on left
@@ -140,8 +142,7 @@ bool ExpandNode(node nd, int successor, node &new_node){
 				//new_node.parent_node = nd.state;
 				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
 				new_node.state_key = state_string(new_node);
-
-
+				return true;
 			}
 		}
 		break;
@@ -163,6 +164,7 @@ bool ExpandNode(node nd, int successor, node &new_node){
 				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
 				new_node.state_key = state_string(new_node);
 
+				return true;
 
 			}
 		}
@@ -178,8 +180,7 @@ bool ExpandNode(node nd, int successor, node &new_node){
 				//new_node.parent_node = nd.state;
 				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
 				new_node.state_key = state_string(new_node);
-
-
+				return true;
 			}
 		}
 		break;
@@ -202,7 +203,7 @@ bool ExpandNode(node nd, int successor, node &new_node){
 				//new_node.parent_node = nd.state;
 				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
 				new_node.state_key = state_string(new_node);
-
+				return true;
 
 			}
 		}
@@ -221,7 +222,7 @@ bool ExpandNode(node nd, int successor, node &new_node){
 				//new_node.parent_node = nd.state;
 				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
 				new_node.state_key = state_string(new_node);
-
+				return true;
 			}
 		}
 		break;
@@ -244,7 +245,7 @@ bool ExpandNode(node nd, int successor, node &new_node){
 
 				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
 				new_node.state_key = state_string(new_node);
-
+				return true;
 
 			}
 		}
@@ -258,6 +259,7 @@ bool ExpandNode(node nd, int successor, node &new_node){
 				new_node.state.right_boats = 1;
 				new_node.depth += 1;
 				new_node.state_key = state_string(new_node);
+				return true;
 			}
 		}
 		break;
@@ -272,43 +274,105 @@ bool bfs(node starting_node, node goal_node, deque<node> &fringe){
 	node nd;
 
 	auto result_set = myset.insert(starting_node.state_key);
-	fringe.push_back(starting_node);
+	fringe.push_front(starting_node);
+
 	while (!fringe.empty()){
-		node new_node = nd;
 		nd = fringe.front();
 		print_node(nd);
 
-
-
-		ExpandNode(nd, 0, new_node);
-
-
-		result_set = myset.insert(new_node.state_key);
-		if (result_set.second)
-			fringe.push_back(new_node);
-		if (nodePassed(new_node, goal_node)){
-			return true;
+		for (int i = 1; i <= 5; i++){
+			node new_node = nd;
+			if (ExpandNode(nd, i, new_node) == true){
+				result_set = myset.insert(new_node.state_key);
+				if (result_set.second)
+					fringe.push_back(new_node);
+				if (nodePassed(new_node, goal_node)){
+					return true;
+				}
+			}
 		}
+
 		fringe.pop_front();
+		NODES_EXPANDED += 1;
 	}
 	return false;
 }
 
-bool general_search(int problem, deque<node> &myqueue){
+bool dfs(node starting_node, node goal_node, deque<node> &fringe){
+	set<string> myset;
+	node nd;
 
-	//create queue
+	auto result_set = myset.insert(starting_node.state_key);
+	fringe.push_front(starting_node);
+	while (!fringe.empty()){
+		bool node_expanded = false;
 
-	//while (!myqueue.empty()){
-	//	node temp = myqueue.front();
-	//	print_node(temp);
-	//	myqueue.pop();
-	//}
+		nd = fringe.front();
+		print_node(nd);
 
-
+		for (int i = 5; i > 0; i--){
+			node new_node = nd;
+			if (ExpandNode(nd, i, new_node) == true){
+				result_set = myset.insert(new_node.state_key);
+				//wrong need to check if we found sorter path earlier
+				if (result_set.second){
+					fringe.push_front(new_node);
+					node_expanded = true;
+				}
+				if (nodePassed(new_node, goal_node)){
+					return true;
+				}
+			}
+			NODES_EXPANDED += 1;
+		}
+		//NODES_EXPANDED += 1;
+		if (node_expanded == false)
+			fringe.pop_front();
+	}
 	return false;
-
 }
+bool idfs(node starting_node, node goal_node, deque<node> &fringe){
+	set<string> myset;
+	node nd;
 
+	int max_depth = 1;
+
+	while (max_depth){
+		myset.clear();
+		auto result_set = myset.insert(starting_node.state_key);
+		fringe.push_front(starting_node);
+		while (!fringe.empty()){
+			bool node_expanded = false;
+
+			nd = fringe.front();
+			print_node(nd);
+
+			//check if current is greater than max depth
+			if (nd.depth <= max_depth){
+				for (int i = 5; i > 0; i--){
+					node new_node = nd;
+					if (ExpandNode(nd, i, new_node) == true){
+						result_set = myset.insert(new_node.state_key);
+						//wrong need to check if we found sorter path earlier
+						if (result_set.second){
+							fringe.push_front(new_node);
+							node_expanded = true;
+						}
+						if (nodePassed(new_node, goal_node)){
+							return true;
+						}
+					}
+					NODES_EXPANDED += 1;
+				}
+			}
+			//NODES_EXPANDED += 1;
+			if (node_expanded == false)
+				fringe.pop_front();
+		}
+		max_depth += 1;
+	}
+	return false;
+}
 int main(int argc, _TCHAR* argv[])
 {
 	deque<node> some_queue;
@@ -331,20 +395,24 @@ int main(int argc, _TCHAR* argv[])
 	starting_node.state.right_boats = 1;
 	starting_node.state_key = state_string(starting_node);
 
-	if (general_search(5,some_queue)){
-		print_node(some_queue.front());
-		printf("found a soultion\n");
 
+	if (idfs(starting_node, goal_node, some_queue)){
+		cout << "found a soultion\n";
+		cout << "Nodes expanded ="  << NODES_EXPANDED << endl;
+	}
+	else
+		cout << "failed to find a soultion";
 
-		node temp = some_queue.back();
-		print_node(temp);
+	while (!some_queue.empty()){
+		node temp = some_queue.front();
+		//print_node(temp);
 		some_queue.pop_front();
+		if (temp.depth != 0){
 
+		}
 	}
-	  else {
-		printf("failed to find a soultion\n");
-	}
-	printf("\nhello world\n");
+
+	cout << "hello world\n";
 	getchar();
 	return 0;
 }
