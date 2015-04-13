@@ -10,6 +10,7 @@
 #include <deque>
 #include <string>
 #include <set>
+#include <unordered_map>
 
 using namespace std;
 
@@ -262,9 +263,10 @@ bool ExpandNode(node nd, int successor, node &new_node){
 
 bool bfs(node starting_node, node goal_node, deque<node> &fringe){
 	set<string> myset;
+	unordered_map<string, node> hashTable;
 	node nd;
 
-	auto result_set = myset.insert(starting_node.state_key);
+	auto closedList = myset.insert(starting_node.state_key);
 	fringe.push_front(starting_node);
 
 	while (!fringe.empty()){
@@ -282,10 +284,36 @@ bool bfs(node starting_node, node goal_node, deque<node> &fringe){
 		for (int i = 1; i <= 5; i++){
 			node new_node = nd;
 			if (ExpandNode(nd, i, new_node) == true){
-				result_set = myset.insert(new_node.state_key);
-				//dont add to queue if we have seen this state before
-				if (result_set.second)
+				closedList = myset.insert(new_node.state_key);
+
+
+
+				//if we have never seen state before add it
+				if (hashTable.find(new_node.state_key) == hashTable.end()){
+					hashTable.emplace(new_node.state_key, new_node);
 					fringe.push_back(new_node);
+				}
+				//else replace only if new depth is less
+				else{
+					node existing_node = hashTable[new_node.state_key];
+
+					if (existing_node.depth > new_node.depth){
+						hashTable.erase(existing_node.state_key);
+						hashTable.emplace(new_node.state_key, new_node);
+					}
+				}
+
+
+				////dont add to queue if we have seen this state before
+				//if (closedList.second){
+				//	fringe.push_back(new_node);
+				//}
+				////first check if the new state has a lower depth then previous, should never occur for bfs 
+				//else{
+				//	cout << "allready contained node";
+				//	//closedList.
+				//	print_node(new_node);
+				//}
 			}
 		}
 		NODES_EXPANDED += 1;
@@ -378,8 +406,8 @@ int main(int argc, _TCHAR* argv[])
 	node starting_node;
 	node goal_node;
 
-	goal_node.state.left_missionaries = 100;
-	goal_node.state.left_cannibals = 90;
+	goal_node.state.left_missionaries = 3;
+	goal_node.state.left_cannibals = 3;
 	goal_node.state.left_boats = 1;
 	goal_node.state.right_missionaries = 0;
 	goal_node.state.right_cannibals = 0;
@@ -389,8 +417,8 @@ int main(int argc, _TCHAR* argv[])
 	starting_node.state.left_missionaries = 0;
 	starting_node.state.left_cannibals = 0;
 	starting_node.state.left_boats = 0;
-	starting_node.state.right_missionaries = 100;
-	starting_node.state.right_cannibals = 90;
+	starting_node.state.right_missionaries = 3;
+	starting_node.state.right_cannibals = 3;
 	starting_node.state.right_boats = 1;
 	starting_node.state_key = state_string(starting_node);
 
