@@ -74,7 +74,7 @@ void printCompletePath(node nd,unordered_map<string,node> hashTable){
 		temp_node = hashTable[temp_node.parent_key];
 	} while (temp_node.parent_key != "root");
 	print_node(temp_node);
-
+	cout << "depth of soution was = " << nd.depth << endl;
 }
 
 bool ExpandNode(node nd, int successor, node &new_node){
@@ -287,12 +287,12 @@ bool ExpandNode(node nd, int successor, node &new_node){
 }
 
 bool bfs(node starting_node, node goal_node, deque<node> &fringe){
-	set<string> myset;
 	unordered_map<string, node> hashTable;
 	node nd;
-	//auto closedList = myset.insert(starting_node.state_key);
+
 	fringe.push_front(starting_node);
 	hashTable.emplace(starting_node.state_key, starting_node);
+
 	while (!fringe.empty()){
 		//get first node in queue
 		nd = fringe.front();
@@ -335,21 +335,23 @@ bool bfs(node starting_node, node goal_node, deque<node> &fringe){
 	return false;
 }
 
+
 bool dfs(node starting_node, node goal_node, deque<node> &fringe){
-	set<string> myset;
+	unordered_map<string, node> hashTable;
 	node nd;
 
-	auto result_set = myset.insert(starting_node.state_key);
 	fringe.push_front(starting_node);
+	hashTable.emplace(starting_node.state_key, starting_node);
 
 	while (!fringe.empty()){
-		//get front of queue
+		//get first node in queue
 		nd = fringe.front();
 		fringe.pop_front();
 		print_node(nd);
 
-		//check if goal node
+		//Is this our goal node
 		if (nodePassed(nd, goal_node)){
+			printCompletePath(nd, hashTable);
 			return true;
 		}
 
@@ -357,37 +359,54 @@ bool dfs(node starting_node, node goal_node, deque<node> &fringe){
 		for (int i = 5; i > 0; i--){
 			node new_node = nd;
 			if (ExpandNode(nd, i, new_node) == true){
-				result_set = myset.insert(new_node.state_key);
-				if (result_set.second){
+
+				//if we have never seen state before add it
+				if (hashTable.find(new_node.state_key) == hashTable.end()){
+					hashTable.emplace(new_node.state_key, new_node);
 					fringe.push_front(new_node);
+				}
+				//else replace only if new depth is less
+				else{
+					node existing_node = hashTable[new_node.state_key];
+
+					//should never be true for bfs
+					if (existing_node.depth > new_node.depth){
+						hashTable.erase(existing_node.state_key);
+						hashTable.emplace(new_node.state_key, new_node);
+						fringe.push_front(new_node);
+					}
 				}
 
 			}
 		}
-
 		NODES_EXPANDED += 1;
 	}
 	return false;
 }
+
+
 bool idfs(node starting_node, node goal_node, deque<node> &fringe){
-	set<string> myset;
+	unordered_map<string, node> hashTable;
 	node nd;
+
 
 	int max_depth = 1;
 
 	while (max_depth){
-		myset.clear();
-		auto result_set = myset.insert(starting_node.state_key);
+		cout << "max depth=" << max_depth << endl;
+		hashTable.clear();
+		hashTable.emplace(starting_node.state_key, starting_node);
 		fringe.push_front(starting_node);
 
 		while (!fringe.empty()){
 			//get front of queue
 			nd = fringe.front();
 			fringe.pop_front();
-			print_node(nd);
+			//print_node(nd);
 
 			//check if goal node
 			if (nodePassed(nd, goal_node)){
+				printCompletePath(nd, hashTable);
 				return true;
 			}
 
@@ -398,10 +417,21 @@ bool idfs(node starting_node, node goal_node, deque<node> &fringe){
 				for (int i = 5; i > 0; i--){
 					node new_node = nd;
 					if (ExpandNode(nd, i, new_node) == true){
-						result_set = myset.insert(new_node.state_key);
-						//wrong need to check if we found sorter path earlier
-						if (result_set.second){
+						//if we have never seen state before add it
+						if (hashTable.find(new_node.state_key) == hashTable.end()){
+							hashTable.emplace(new_node.state_key, new_node);
 							fringe.push_front(new_node);
+						}
+						//else replace only if new depth is less
+						else{
+							node existing_node = hashTable[new_node.state_key];
+
+							//should never be true for bfs
+							if (existing_node.depth > new_node.depth){
+								hashTable.erase(existing_node.state_key);
+								hashTable.emplace(new_node.state_key, new_node);
+								fringe.push_front(new_node);
+							}
 						}
 
 					}
@@ -420,8 +450,8 @@ int main(int argc, _TCHAR* argv[])
 	node starting_node;
 	node goal_node;
 
-	goal_node.state.left_missionaries = 100;
-	goal_node.state.left_cannibals = 90;
+	goal_node.state.left_missionaries = 10;
+	goal_node.state.left_cannibals = 8;
 	goal_node.state.left_boats = 1;
 	goal_node.state.right_missionaries = 0;
 	goal_node.state.right_cannibals = 0;
@@ -431,15 +461,15 @@ int main(int argc, _TCHAR* argv[])
 	starting_node.state.left_missionaries = 0;
 	starting_node.state.left_cannibals = 0;
 	starting_node.state.left_boats = 0;
-	starting_node.state.right_missionaries = 100;
-	starting_node.state.right_cannibals = 90;
+	starting_node.state.right_missionaries = 10;
+	starting_node.state.right_cannibals = 8;
 	starting_node.state.right_boats = 1;
 	starting_node.state_key = state_string(starting_node);
 	starting_node.depth = 0;
 	starting_node.parent_key = "root";
 
 
-	if (bfs(starting_node, goal_node, some_queue)){
+	if (idfs(starting_node, goal_node, some_queue)){
 		cout << "found a soultion\n";
 		cout << "Nodes expanded ="  << NODES_EXPANDED << endl;
 	}
