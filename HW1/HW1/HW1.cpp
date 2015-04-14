@@ -13,6 +13,9 @@
 #include <unordered_map>
 #include <conio.h>
 #include <windows.h>
+#include <vector>
+
+
 using namespace std;
 
 struct bank_state{
@@ -62,17 +65,25 @@ bool nodePassed(node current, node goal){
 		return false;
 }
 
-void printCompletePath(node nd,unordered_map<string,node> hashTable){
+void printCompletePath(node nd, unordered_map<string, node> hashTable, string output_file){
 	cout << "found soultion complete path from back to front" << endl;
+	ofstream outFile;
+	outFile.open(output_file);
 
 	node temp_node = nd;
 
 	do{ 		
 		print_node(temp_node);
+		outFile << state_string(temp_node) << " depth of " << temp_node.depth << endl;
 		temp_node = hashTable[temp_node.parent_key];
 	} while (temp_node.parent_key != "root");
 	print_node(temp_node);
-	cout << "depth of soution was = " << nd.depth << endl;
+	outFile << state_string(temp_node) << " depth of " << temp_node.depth << endl;
+	cout << "depth of soution was = " << nd.depth << "     " << endl;
+	outFile << "depth of soution was = " << nd.depth << "   \n" << endl;
+	cout << "expanded nodes" << NODES_EXPANDED << "      \n" << endl;
+	outFile << "expanded nodes" << NODES_EXPANDED << "     \n" << endl;
+	outFile.close();
 }
 
 bool ExpandNode(node nd, int successor, node &new_node){
@@ -293,10 +304,10 @@ bool ExpandNode(node nd, int successor, node &new_node){
 	return false;
 }
 
-bool bfs(node starting_node, node goal_node, deque<node> &fringe){
+bool bfs(node starting_node, node goal_node, string output_file){
 	unordered_map<string, node> hashTable;
 	node nd;
-
+	deque<node> fringe;
 	fringe.push_front(starting_node);
 	hashTable.emplace(starting_node.state_key, starting_node);
 
@@ -308,7 +319,7 @@ bool bfs(node starting_node, node goal_node, deque<node> &fringe){
 
 		//Is this our goal node
 		if (nodePassed(nd, goal_node)){
-			printCompletePath(nd, hashTable);
+			printCompletePath(nd, hashTable, output_file);
 			return true;
 		}
 
@@ -330,10 +341,10 @@ bool bfs(node starting_node, node goal_node, deque<node> &fringe){
 }
 
 
-bool dfs(node starting_node, node goal_node, deque<node> &fringe){
+bool dfs(node starting_node, node goal_node, string output_file){
 	unordered_map<string, node> hashTable;
 	node nd;
-
+	deque<node> fringe;
 	fringe.push_front(starting_node);
 	hashTable.emplace(starting_node.state_key, starting_node);
 
@@ -345,7 +356,7 @@ bool dfs(node starting_node, node goal_node, deque<node> &fringe){
 
 		//Is this our goal node
 		if (nodePassed(nd, goal_node)){
-			printCompletePath(nd, hashTable);
+			printCompletePath(nd, hashTable, output_file);
 			return true;
 		}
 
@@ -379,10 +390,10 @@ bool dfs(node starting_node, node goal_node, deque<node> &fringe){
 }
 
 
-bool idfs(node starting_node, node goal_node, deque<node> &fringe){
+bool idfs(node starting_node, node goal_node, string output_file){
 	unordered_map<string, node> hashTable;
 	node nd;
-
+	deque<node> fringe;
 
 	int max_depth = 1;
 
@@ -400,7 +411,7 @@ bool idfs(node starting_node, node goal_node, deque<node> &fringe){
 
 			//check if goal node
 			if (nodePassed(nd, goal_node)){
-				printCompletePath(nd, hashTable);
+				printCompletePath(nd, hashTable,output_file);
 				return true;
 			}
 
@@ -453,7 +464,7 @@ public:
 	}
 };
 
-bool aStar(node starting_node, node goal_node, deque<node> &fringe){
+bool aStar(node starting_node, node goal_node, string output_file){
 	unordered_map<string, node> hashTable;
 	node nd;
 	priority_queue<node, vector<node>, CompareHeuristic> pq;
@@ -468,7 +479,7 @@ bool aStar(node starting_node, node goal_node, deque<node> &fringe){
 
 		//Is this our goal node
 		if (nodePassed(nd, goal_node)){
-			printCompletePath(nd, hashTable);
+			printCompletePath(nd, hashTable, output_file);
 			return true;
 		}
 
@@ -502,38 +513,124 @@ bool aStar(node starting_node, node goal_node, deque<node> &fringe){
 }
 
 
-int main(int argc, _TCHAR* argv[])
+int main(int argc, char *argv[])
 {
 	deque<node> some_queue;
 	node starting_node;
 	node goal_node;
+	vector<string> all_args;
 
-	goal_node.state.left_missionaries = 3;
-	goal_node.state.left_cannibals = 3;
-	goal_node.state.left_boats = 1;
-	goal_node.state.right_missionaries = 0;
-	goal_node.state.right_cannibals = 0;
-	goal_node.state.right_boats = 0;
+	if (argc != 5){
+		cout << "Total of 4 command line arguements must be given" << endl;
+		return -1;
+	}
+	if (argc > 1) {
+		all_args.assign(argv, argv + argc);
+	}
 
 
-	starting_node.state.left_missionaries = 0;
-	starting_node.state.left_cannibals = 0;
+	//startFile
+	string line;
+	ifstream startFile(all_args[1]);
+	vector<string> mylist;
+	string inputValues[8];
+	if (startFile.is_open())
+	{
+		int i = 0;
+		while (getline(startFile, line))
+		{
+			string delim = ",";
+			auto start = 0U;
+			auto end = line.find(delim);
+			//inputValues[i] = line.substr(start, end - start);
+			while (end != string::npos){
+				inputValues[i] = line.substr(start, end - start);
+				cout << line.substr(start, end - start) << endl;
+				mylist.push_back(line.substr(start, end - start));
+				start = end + delim.length();
+				end = line.find(delim, start);
+				i++;
+			}
+			cout << line.substr(start, end) << endl;
+		}
+		startFile.close();
+	}
+	for (int i = 0; i < 6; i++){
+		if (inputValues[i] == ""){
+			inputValues[i] = "0";
+		}
+	}
+	starting_node.state.left_missionaries = stoi(inputValues[0]);
+	starting_node.state.left_cannibals = stoi(inputValues[1]);
 	starting_node.state.left_boats = 0;
-	starting_node.state.right_missionaries = 3;
-	starting_node.state.right_cannibals = 3;
+	starting_node.state.right_missionaries = stoi(inputValues[2]);
+	starting_node.state.right_cannibals = stoi(inputValues[3]);
 	starting_node.state.right_boats = 1;
 	starting_node.state_key = state_string(starting_node);
 	starting_node.depth = 0;
 	starting_node.heuristic = starting_node.state.right_cannibals + starting_node.state.right_missionaries;
 	starting_node.parent_key = "root";
 
+	//goal file
 
-	if (aStar(starting_node, goal_node, some_queue)){
-		cout << "found a soultion\n";
-		cout << "Nodes expanded ="  << NODES_EXPANDED << endl;
+
+
+	cout << all_args[2] << endl;
+	ifstream goalFile(all_args[2]);
+	if (goalFile.is_open())
+	{
+		int i = 0;
+		while (getline(goalFile, line))
+		{
+			string delim = ",";
+			auto start = 0U;
+			auto end = line.find(delim);
+			while (end != string::npos){
+				cout << line.substr(start, end - start) << endl;
+				mylist.push_back(line.substr(start, end - start));
+				inputValues[i] = "";
+				inputValues[i] = line.substr(start, end - start);
+				start = end + delim.length();
+				end = line.find(delim, start);
+				i++;
+			}
+			cout << line.substr(start, end) << endl;
+		}
+		goalFile.close();
 	}
-	else
-		cout << "failed to find a soultion";
+	for (int i = 0; i < 6; i++){
+		if (inputValues[i] == ""){
+			inputValues[i] = "0";
+		}
+	}
+	goal_node.state.left_missionaries = stoi(inputValues[0]);
+	goal_node.state.left_cannibals = stoi(inputValues[1]);
+	goal_node.state.left_boats = 1;
+	goal_node.state.right_missionaries = stoi(inputValues[3]);
+	goal_node.state.right_cannibals = stoi(inputValues[4]);
+	goal_node.state.right_boats = 0;
+
+
+
+	//Mode
+	if ( all_args[3] == "bfs"){
+		cout << "bfs selected" << endl;
+		bfs(starting_node, goal_node, all_args[4]);
+	}
+	else if (all_args[3] == "dfs"){
+		cout << "dfs selected" << endl;
+		dfs(starting_node, goal_node, all_args[4]);
+	}
+	else if (all_args[3] == "iddfs"){
+		cout << "iddfs selected" << endl;
+		idfs(starting_node, goal_node, all_args[4]);
+	}
+	else if (all_args[3] == "astar"){
+		cout << "astar selected" << endl;
+		aStar(starting_node, goal_node, all_args[4]);
+
+	}
+	cout << "Nodes expanded ="  << NODES_EXPANDED << endl;
 
 	getchar();
 	return 0;
