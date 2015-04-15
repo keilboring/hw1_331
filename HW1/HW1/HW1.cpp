@@ -14,7 +14,7 @@
 #include <conio.h>
 #include <windows.h>
 #include <vector>
-
+#include <stack>
 
 using namespace std;
 
@@ -71,19 +71,29 @@ void printCompletePath(node nd, unordered_map<string, node> hashTable, string ou
 	outFile.open(output_file);
 
 	node temp_node = nd;
-
+	stack<string> lines;
 	do{ 		
-		print_node(temp_node);
-		outFile << state_string(temp_node) << " depth of " << temp_node.depth << endl;
+		lines.push( state_string(temp_node) + " depth of " + to_string(temp_node.depth));
 		temp_node = hashTable[temp_node.parent_key];
 	} while (temp_node.parent_key != "root");
-	print_node(temp_node);
-	outFile << state_string(temp_node) << " depth of " << temp_node.depth << endl;
+
+	lines.push( state_string(temp_node) + " depth of " + to_string(temp_node.depth));
+
+	while (!lines.empty()){
+		outFile << lines.top() << endl;
+		cout << lines.top() << endl;
+		lines.pop();
+	}
+
+
+
 	cout << "depth of soution was = " << nd.depth << "     " << endl;
 	outFile << "depth of soution was = " << nd.depth << "   \n" << endl;
 	cout << "expanded nodes" << NODES_EXPANDED << "      \n" << endl;
 	outFile << "expanded nodes" << NODES_EXPANDED << "     \n" << endl;
 	outFile.close();
+
+
 }
 
 bool ExpandNode(node nd, int successor, node &new_node){
@@ -108,7 +118,7 @@ bool ExpandNode(node nd, int successor, node &new_node){
 				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
 				new_node.state_key = state_string(new_node);
 				new_node.parent_key = nd.state_key;
-				new_node.heuristic = new_node.state.right_cannibals + new_node.state.right_missionaries;
+				new_node.heuristic = new_node.state.right_cannibals + new_node.state.right_missionaries - 1;
 				return true;
 			}
 		}
@@ -125,7 +135,7 @@ bool ExpandNode(node nd, int successor, node &new_node){
 				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
 				new_node.state_key = state_string(new_node);
 				new_node.parent_key = nd.state_key;
-				new_node.heuristic = new_node.state.right_cannibals + new_node.state.right_missionaries;
+				new_node.heuristic = new_node.state.right_cannibals + new_node.state.right_missionaries - 1;
 				return true;
 			}
 		}
@@ -148,7 +158,7 @@ bool ExpandNode(node nd, int successor, node &new_node){
 				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
 				new_node.state_key = state_string(new_node);
 				new_node.parent_key = nd.state_key;				
-				new_node.heuristic = new_node.state.right_cannibals + new_node.state.right_missionaries;
+				new_node.heuristic = new_node.state.right_cannibals + new_node.state.right_missionaries - 1;
 				return true;
 			}
 		}
@@ -165,7 +175,7 @@ bool ExpandNode(node nd, int successor, node &new_node){
 				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
 				new_node.state_key = state_string(new_node);
 				new_node.parent_key = nd.state_key;
-				new_node.heuristic = new_node.state.right_cannibals + new_node.state.right_missionaries;
+				new_node.heuristic = new_node.state.right_cannibals + new_node.state.right_missionaries - 1;
 				return true;
 			}
 		}
@@ -188,7 +198,7 @@ bool ExpandNode(node nd, int successor, node &new_node){
 				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
 				new_node.state_key = state_string(new_node);
 				new_node.parent_key = nd.state_key;
-				new_node.heuristic = new_node.state.right_cannibals + new_node.state.right_missionaries;
+				new_node.heuristic = new_node.state.right_cannibals + new_node.state.right_missionaries - 1;
 				return true;
 
 			}
@@ -206,7 +216,7 @@ bool ExpandNode(node nd, int successor, node &new_node){
 				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
 				new_node.state_key = state_string(new_node);
 				new_node.parent_key = nd.state_key;
-				new_node.heuristic = new_node.state.right_cannibals + new_node.state.right_missionaries;
+				new_node.heuristic = new_node.state.right_cannibals + new_node.state.right_missionaries - 1;
 				return true;
 			}
 		}
@@ -231,7 +241,7 @@ bool ExpandNode(node nd, int successor, node &new_node){
 				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
 				new_node.state_key = state_string(new_node);
 				new_node.parent_key = nd.state_key;
-				new_node.heuristic = new_node.state.right_cannibals + new_node.state.right_missionaries;
+				new_node.heuristic = new_node.state.right_cannibals + new_node.state.right_missionaries - 1;
 				return true;
 
 			}
@@ -252,7 +262,7 @@ bool ExpandNode(node nd, int successor, node &new_node){
 				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
 				new_node.state_key = state_string(new_node);
 				new_node.parent_key = nd.state_key;
-				new_node.heuristic = new_node.state.right_cannibals + new_node.state.right_missionaries;
+				new_node.heuristic = new_node.state.right_cannibals + new_node.state.right_missionaries - 1;
 				return true;
 			}
 		}
@@ -277,7 +287,7 @@ bool ExpandNode(node nd, int successor, node &new_node){
 				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
 				new_node.state_key = state_string(new_node);
 				new_node.parent_key = nd.state_key;
-				new_node.heuristic = new_node.state.right_cannibals + new_node.state.right_missionaries;
+				new_node.heuristic = new_node.state.right_cannibals + new_node.state.right_missionaries - 1;
 				return true;
 
 			}
@@ -293,7 +303,7 @@ bool ExpandNode(node nd, int successor, node &new_node){
 				new_node.depth += 1;
 				new_node.state_key = state_string(new_node);
 				new_node.parent_key = nd.state_key;
-				new_node.heuristic = new_node.state.right_cannibals + new_node.state.right_missionaries;
+				new_node.heuristic = new_node.state.right_cannibals + new_node.state.right_missionaries - 1;
 				return true;
 			}
 		}
@@ -323,6 +333,7 @@ bool bfs(node starting_node, node goal_node, string output_file){
 			return true;
 		}
 
+		NODES_EXPANDED += 1;
 		//expand node
 		for (int i = 1; i <= 5; i++){
 			node new_node = nd;
@@ -335,7 +346,6 @@ bool bfs(node starting_node, node goal_node, string output_file){
 				}
 			}
 		}
-		NODES_EXPANDED += 1;
 	}
 	return false;
 }
@@ -353,12 +363,14 @@ bool dfs(node starting_node, node goal_node, string output_file){
 		nd = fringe.front();
 		fringe.pop_front();
 		print_node(nd);
-
+		//Sleep(1000);
 		//Is this our goal node
 		if (nodePassed(nd, goal_node)){
 			printCompletePath(nd, hashTable, output_file);
 			return true;
 		}
+		
+		NODES_EXPANDED += 1;
 
 		//expand node
 		for (int i = 5; i > 0; i--){
@@ -384,7 +396,6 @@ bool dfs(node starting_node, node goal_node, string output_file){
 
 			}
 		}
-		NODES_EXPANDED += 1;
 	}
 	return false;
 }
@@ -415,6 +426,7 @@ bool idfs(node starting_node, node goal_node, string output_file){
 				return true;
 			}
 
+			NODES_EXPANDED += 1;
 			//check if depth is passed max depth
 			if (nd.depth <= max_depth){
 
@@ -443,7 +455,6 @@ bool idfs(node starting_node, node goal_node, string output_file){
 				}
 			}
 
-			NODES_EXPANDED += 1;
 		}
 		max_depth += 1;
 	}
@@ -483,6 +494,7 @@ bool aStar(node starting_node, node goal_node, string output_file){
 			return true;
 		}
 
+		NODES_EXPANDED += 1;
 		//expand node
 		for (int i = 1; i <= 5; i++){
 			node new_node = nd;
@@ -507,7 +519,6 @@ bool aStar(node starting_node, node goal_node, string output_file){
 
 			}
 		}
-		NODES_EXPANDED += 1;
 	}
 	return false;
 }
