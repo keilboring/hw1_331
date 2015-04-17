@@ -3,7 +3,6 @@
 // Keil Boring CS311 HW#1
 
 
-#include "stdafx.h"
 #include <iostream>
 #include <fstream>
 #include <queue>
@@ -11,29 +10,40 @@
 #include <string>
 #include <set>
 #include <unordered_map>
-#include <conio.h>
-#include <windows.h>
 #include <vector>
 #include <stack>
+#include <sstream>
 
 using namespace std;
 
 struct bank_state{
-	int left_missionaries = 0;
-	int left_cannibals = 0;
-	int left_boats = 0;
-	int right_missionaries = 0;
-	int right_cannibals = 0;
-	int right_boats = 0;
+	int left_missionaries ;
+	int left_cannibals ;
+	int left_boats ;
+	int right_missionaries ;
+	int right_cannibals ;
+	int right_boats ;
+
+	//bank_state() {
+	//	left_missionaries = 0;
+	//	left_cannibals = 0;
+	//	left_boats = 0;
+	//	right_missionaries = 0;
+	//	right_cannibals = 0;
+	//	right_boats = 0;
+	//}
 };
 
 struct node{
 	bank_state state;
-	//int operation = 0;
-	int depth = 0;
+	int depth ;
 	int heuristic;
-	string parent_key = "";
-	string state_key = "";
+	string parent_key ;
+	string state_key ;
+
+/*	node() {
+		depth = 0;
+	}*/
 };
 
 int NODES_EXPANDED = 0;
@@ -43,11 +53,16 @@ void print_node(node temp){
 		<< "," << temp.state.right_cannibals << "," << temp.state.right_boats << "," << "    depth=" << temp.depth <<  endl;
 
 }
-
+string IntToString(int a)
+{
+	ostringstream temp;
+	temp << a;
+	return temp.str();
+}
 string state_string(node temp){
 	string temp_string = "";
-	temp_string =  to_string( temp.state.left_missionaries )  + ","  + to_string( temp.state.left_cannibals )  + ","  + to_string( temp.state.left_boats )  + ","  + to_string( temp.state.right_missionaries
-		)  + ","  + to_string( temp.state.right_cannibals ) + ","  + to_string( temp.state.right_boats );   
+	temp_string =  IntToString( temp.state.left_missionaries )  + ","  + IntToString( temp.state.left_cannibals )  + ","  + IntToString( temp.state.left_boats )  + ","  + IntToString( temp.state.right_missionaries
+		)  + ","  + IntToString( temp.state.right_cannibals ) + ","  + IntToString( temp.state.right_boats );   
 	return temp_string;
 }
 
@@ -73,11 +88,11 @@ void printCompletePath(node nd, unordered_map<string, node> hashTable, string ou
 	node temp_node = nd;
 	stack<string> lines;
 	do{ 		
-		lines.push( state_string(temp_node) + " depth of " + to_string(temp_node.depth));
+		lines.push( state_string(temp_node) + " depth of " + IntToString(temp_node.depth));
 		temp_node = hashTable[temp_node.parent_key];
 	} while (temp_node.parent_key != "root");
 
-	lines.push( state_string(temp_node) + " depth of " + to_string(temp_node.depth));
+	lines.push( state_string(temp_node) + " depth of " + IntToString(temp_node.depth));
 
 	while (!lines.empty()){
 		outFile << lines.top() << endl;
@@ -319,7 +334,8 @@ bool bfs(node starting_node, node goal_node, string output_file){
 	node nd;
 	deque<node> fringe;
 	fringe.push_front(starting_node);
-	hashTable.emplace(starting_node.state_key, starting_node);
+	pair<string, node> mypair(starting_node.state_key, starting_node);
+	hashTable.insert(mypair);
 
 	while (!fringe.empty()){
 		//get first node in queue
@@ -341,7 +357,8 @@ bool bfs(node starting_node, node goal_node, string output_file){
 
 				//if we have never seen state before add it
 				if (hashTable.find(new_node.state_key) == hashTable.end()){
-					hashTable.emplace(new_node.state_key, new_node);
+					pair<string, node> temp_pair(new_node.state_key, new_node);
+					hashTable.insert(temp_pair);
 					fringe.push_back(new_node);
 				}
 			}
@@ -356,7 +373,8 @@ bool dfs(node starting_node, node goal_node, string output_file){
 	node nd;
 	deque<node> fringe;
 	fringe.push_front(starting_node);
-	hashTable.emplace(starting_node.state_key, starting_node);
+	pair<string, node> mypair(starting_node.state_key, starting_node);
+	hashTable.insert(mypair);
 
 	while (!fringe.empty()){
 		//get first node in queue
@@ -379,7 +397,8 @@ bool dfs(node starting_node, node goal_node, string output_file){
 				//print_node(new_node);
 				//if we have never seen state before add it
 				if (hashTable.find(new_node.state_key) == hashTable.end()){
-					hashTable.emplace(new_node.state_key, new_node);
+					pair<string, node> temp_pair(new_node.state_key, new_node);
+					hashTable.insert(temp_pair);
 					fringe.push_front(new_node);
 				}
 				//else replace only if new depth is less
@@ -389,7 +408,8 @@ bool dfs(node starting_node, node goal_node, string output_file){
 					//should never be true for bfs
 					if (existing_node.depth > new_node.depth){
 						hashTable.erase(existing_node.state_key);
-						hashTable.emplace(new_node.state_key, new_node);
+						pair<string, node> temp_pair(new_node.state_key, new_node);
+						hashTable.insert(temp_pair);
 						fringe.push_front(new_node);
 					}
 				}
@@ -411,7 +431,8 @@ bool idfs(node starting_node, node goal_node, string output_file){
 	while (max_depth){
 		cout << "max depth=" << max_depth << endl;
 		hashTable.clear();
-		hashTable.emplace(starting_node.state_key, starting_node);
+		pair<string, node> mypair(starting_node.state_key, starting_node);
+		hashTable.insert(mypair);
 		fringe.push_front(starting_node);
 
 		while (!fringe.empty()){
@@ -436,7 +457,8 @@ bool idfs(node starting_node, node goal_node, string output_file){
 					if (ExpandNode(nd, i, new_node) == true){
 						//if we have never seen state before add it
 						if (hashTable.find(new_node.state_key) == hashTable.end()){
-							hashTable.emplace(new_node.state_key, new_node);
+							pair<string, node> temp_pair(new_node.state_key, new_node);
+							hashTable.insert(temp_pair);
 							fringe.push_front(new_node);
 						}
 						//else replace only if new depth is less
@@ -446,7 +468,8 @@ bool idfs(node starting_node, node goal_node, string output_file){
 							//should never be true for bfs
 							if (existing_node.depth > new_node.depth){
 								hashTable.erase(existing_node.state_key);
-								hashTable.emplace(new_node.state_key, new_node);
+								pair<string, node> temp_pair(new_node.state_key, new_node);
+								hashTable.insert(temp_pair);
 								fringe.push_front(new_node);
 							}
 						}
@@ -480,7 +503,8 @@ bool aStar(node starting_node, node goal_node, string output_file){
 	node nd;
 	priority_queue<node, vector<node>, CompareHeuristic> pq;
 	pq.push(starting_node);
-	hashTable.emplace(starting_node.state_key, starting_node);
+	pair<string, node> mypair(starting_node.state_key, starting_node);
+	hashTable.insert(mypair);
 
 	while (!pq.empty()){
 		//get first node in queue
@@ -502,7 +526,8 @@ bool aStar(node starting_node, node goal_node, string output_file){
 
 				//if we have never seen state before add it
 				if (hashTable.find(new_node.state_key) == hashTable.end()){
-					hashTable.emplace(new_node.state_key, new_node);
+					pair<string, node> temp_pair(new_node.state_key, new_node);
+					hashTable.insert(temp_pair); 
 					pq.push(new_node);
 				}
 				//else replace only if new depth is less
@@ -512,7 +537,8 @@ bool aStar(node starting_node, node goal_node, string output_file){
 					//should never be true for bfs
 					if (existing_node.depth > new_node.depth){
 						hashTable.erase(existing_node.state_key);
-						hashTable.emplace(new_node.state_key, new_node);
+						pair<string, node> temp_pair(new_node.state_key, new_node);
+						hashTable.insert(temp_pair);
 						pq.push(new_node);
 					}
 				}
@@ -643,7 +669,7 @@ int main(int argc, char *argv[])
 	}
 	cout << "Nodes expanded ="  << NODES_EXPANDED << endl;
 
-	getchar();
+	//getchar();
 	return 0;
 }
 
