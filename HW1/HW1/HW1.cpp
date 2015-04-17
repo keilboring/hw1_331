@@ -118,7 +118,7 @@ bool ExpandNode(node nd, int successor, node &new_node){
 				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
 				new_node.state_key = state_string(new_node);
 				new_node.parent_key = nd.state_key;
-                                   new_node.heuristic = 3*(new_node.state.right_cannibals + new_node.state.right_missionaries) - 2;
+                                   new_node.heuristic =((new_node.state.right_cannibals + new_node.state.right_missionaries)/2);
 				return true;
 			}
 		}
@@ -135,7 +135,7 @@ bool ExpandNode(node nd, int successor, node &new_node){
 				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
 				new_node.state_key = state_string(new_node);
 				new_node.parent_key = nd.state_key;
-                                   new_node.heuristic = 3*(new_node.state.right_cannibals + new_node.state.right_missionaries) - 2;
+                                   new_node.heuristic =((new_node.state.right_cannibals + new_node.state.right_missionaries)/2);
 				return true;
 			}
 		}
@@ -158,7 +158,7 @@ bool ExpandNode(node nd, int successor, node &new_node){
 				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
 				new_node.state_key = state_string(new_node);
 				new_node.parent_key = nd.state_key;				
-                                   new_node.heuristic = 3*(new_node.state.right_cannibals + new_node.state.right_missionaries) - 2;
+                                   new_node.heuristic =((new_node.state.right_cannibals + new_node.state.right_missionaries)/2);
 				return true;
 			}
 		}
@@ -175,7 +175,7 @@ bool ExpandNode(node nd, int successor, node &new_node){
 				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
 				new_node.state_key = state_string(new_node);
 				new_node.parent_key = nd.state_key;
-                                   new_node.heuristic = 3*(new_node.state.right_cannibals + new_node.state.right_missionaries) - 2;
+                                   new_node.heuristic =((new_node.state.right_cannibals + new_node.state.right_missionaries)/2);
 				return true;
 			}
 		}
@@ -198,7 +198,7 @@ bool ExpandNode(node nd, int successor, node &new_node){
 				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
 				new_node.state_key = state_string(new_node);
 				new_node.parent_key = nd.state_key;
-                                   new_node.heuristic = 3*(new_node.state.right_cannibals + new_node.state.right_missionaries) - 2;
+                                   new_node.heuristic =((new_node.state.right_cannibals + new_node.state.right_missionaries)/2);
 				return true;
 
 			}
@@ -216,7 +216,7 @@ bool ExpandNode(node nd, int successor, node &new_node){
 				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
 				new_node.state_key = state_string(new_node);
 				new_node.parent_key = nd.state_key;
-                                   new_node.heuristic = 3*(new_node.state.right_cannibals + new_node.state.right_missionaries) - 2;
+                                   new_node.heuristic =((new_node.state.right_cannibals + new_node.state.right_missionaries)/2);
 				return true;
 			}
 		}
@@ -241,7 +241,7 @@ bool ExpandNode(node nd, int successor, node &new_node){
 				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
 				new_node.state_key = state_string(new_node);
 				new_node.parent_key = nd.state_key;
-                                   new_node.heuristic = 3*(new_node.state.right_cannibals + new_node.state.right_missionaries) - 2;
+                                   new_node.heuristic =((new_node.state.right_cannibals + new_node.state.right_missionaries)/2);
 				return true;
 
 			}
@@ -262,7 +262,7 @@ bool ExpandNode(node nd, int successor, node &new_node){
 				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
 				new_node.state_key = state_string(new_node);
 				new_node.parent_key = nd.state_key;
-                                   new_node.heuristic = 3*(new_node.state.right_cannibals + new_node.state.right_missionaries) - 2;
+                                   new_node.heuristic =((new_node.state.right_cannibals + new_node.state.right_missionaries)/2);
 				return true;
 			}
 		}
@@ -287,7 +287,7 @@ bool ExpandNode(node nd, int successor, node &new_node){
 				//new_node.parents = state_string(new_node) + "<--" + nd.parents;
 				new_node.state_key = state_string(new_node);
 				new_node.parent_key = nd.state_key;
-                                   new_node.heuristic = 3*(new_node.state.right_cannibals + new_node.state.right_missionaries) - 2;
+                                   new_node.heuristic =((new_node.state.right_cannibals + new_node.state.right_missionaries)/2);
 				return true;
 
 			}
@@ -303,7 +303,7 @@ bool ExpandNode(node nd, int successor, node &new_node){
 				new_node.depth += 1;
 				new_node.state_key = state_string(new_node);
 				new_node.parent_key = nd.state_key;
-                                   new_node.heuristic = 3*(new_node.state.right_cannibals + new_node.state.right_missionaries) - 2;
+                                   new_node.heuristic =((new_node.state.right_cannibals + new_node.state.right_missionaries)/2);
 				return true;
 			}
 		}
